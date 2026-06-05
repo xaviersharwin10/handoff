@@ -83,8 +83,11 @@ app.post("/recall", async (c) => {
   });
   let results;
   try {
-    const r = await memwal.recall({ query, limit: Math.min(Number(limit) || 5, 20) });
-    results = r.results.map((m) => ({ text: m.text, distance: m.distance }));
+    const r = await memwal.recall({ query, limit: Math.min(Number(limit) || 5, 20), maxDistance: 0.65 });
+    const seen = new Set();
+    results = r.results
+      .filter((m) => (seen.has(m.text) ? false : seen.add(m.text)))
+      .map((m) => ({ text: m.text, distance: m.distance }));
   } catch (e) {
     return deny(502, "recall_failed", { granteeLabel: grant.granteeLabel, namespace: grant.namespace, detail: String(e?.message || e) });
   }

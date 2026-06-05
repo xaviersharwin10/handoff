@@ -1,0 +1,12 @@
+{
+  "name": "handoff-demo-agent",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node agent.mjs"
+  },
+  "dependencies": {
+    "@noble/ed25519": "^2.1.0"
+  }
+}
