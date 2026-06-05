@@ -1,0 +1,8 @@
+[package]
+name = "handoff"
+edition = "2024.beta"
+
+[dependencies]
+
+[addresses]
+handoff = "0x0"
