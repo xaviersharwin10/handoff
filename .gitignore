@@ -25,3 +25,6 @@ contracts/**/build/
 
 # os/editor
 .DS_Store
+
+# cli scratch
+scripts/grant_id.txt
