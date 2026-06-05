@@ -1,0 +1,27 @@
+# secrets / local creds (NEVER commit — contains testnet private keys)
+.owner.testnet.json
+.memwal.testnet.json
+*.key
+.env
+.env.*
+!.env.example
+
+# node
+node_modules/
+.pnpm-store/
+dist/
+build/
+.next/
+out/
+*.tsbuildinfo
+
+# move build
+contracts/**/build/
+
+# cli scratch output
+*.out.json
+*.err.txt
+*.log
+
+# os/editor
+.DS_Store

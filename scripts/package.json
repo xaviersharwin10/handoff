@@ -1,0 +1,15 @@
+{
+  "name": "handoff-scripts",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "smoke": "node memwal-smoke.mjs"
+  },
+  "dependencies": {
+    "@mysten-incubation/memwal": "0.0.7",
+    "@mysten/sui": "^2.17.0",
+    "@mysten/seal": "^1.1.3",
+    "@mysten/walrus": "^1.0.3"
+  }
+}

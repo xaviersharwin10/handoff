@@ -1,0 +1,4 @@
+node_modules/
+.memwal.testnet.json
+.env
+*.log
