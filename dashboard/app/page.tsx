@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { AccountGate, AccountChip } from "./account-gate";
 
 type Mem = { namespace: string; text: string; at: string };
 type Grant = {
@@ -37,7 +38,15 @@ async function jpost(url: string, body: unknown) {
 const short = (s: string) => (s?.length > 14 ? `${s.slice(0, 8)}…${s.slice(-4)}` : s);
 const fmtTime = (ms: number) => new Date(ms).toLocaleString();
 
-export default function Dashboard() {
+export default function Page() {
+  return (
+    <AccountGate>
+      <Dashboard />
+    </AccountGate>
+  );
+}
+
+function Dashboard() {
   return (
     <main className="mx-auto w-full max-w-5xl px-5 py-8">
       <Header />
@@ -66,9 +75,12 @@ function Header() {
             Lend <span className="text-emerald-400">scoped, revocable, time-boxed</span> slices of your AI memory — enforced on-chain.
           </p>
         </div>
-        <span className="ml-auto rounded-full border border-neutral-800 bg-neutral-900 px-3 py-1 text-xs text-neutral-400">
-          OAuth for AI memory
-        </span>
+        <div className="ml-auto flex items-center gap-3">
+          <span className="hidden rounded-full border border-neutral-800 bg-neutral-900 px-3 py-1 text-xs text-neutral-400 sm:inline">
+            OAuth for AI memory
+          </span>
+          <AccountChip />
+        </div>
       </div>
     </header>
   );
