@@ -1,0 +1,8 @@
+[package]
+name = "handoff_vault"
+edition = "2024.beta"
+
+[dependencies]
+
+[addresses]
+handoff_vault = "0x0"
