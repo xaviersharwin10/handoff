@@ -1,0 +1,32 @@
+# Handoff gateway (the enforcement proxy) — deploy on Render (free Node web service).
+# The gateway is the only long-running service; the dashboard + agent app deploy to Vercel.
+# Blueprint deploy: Render dashboard → New → Blueprint → point at this repo.
+services:
+  - type: web
+    name: handoff-gateway
+    runtime: node
+    rootDir: proxy
+    plan: free
+    buildCommand: corepack enable && pnpm install --no-frozen-lockfile
+    startCommand: pnpm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_VERSION
+        value: "20.19.0"
+      # Gateway audit/gas key (signs on-chain AccessLogged events + Seal-decrypts
+      # as each vault's revocable delegate). Set as a SECRET.
+      - key: PROXY_DELEGATE_KEY
+        sync: false
+      # Master secret verifying capture tokens — MUST match the dashboard's. SECRET.
+      - key: HANDOFF_MASTER_SECRET
+        sync: false
+      # Allowed CORS origin(s) for the deployed app, e.g. https://handoff.vercel.app
+      - key: GATEWAY_ALLOWED_ORIGINS
+        sync: false
+      # LLM behind the capture proxy (any OpenAI-compatible provider; Groq is free).
+      - key: LLM_API_KEY
+        sync: false
+      - key: LLM_BASE_URL
+        value: "https://api.groq.com/openai/v1"
+      - key: LLM_MODEL
+        value: "llama-3.3-70b-versatile"

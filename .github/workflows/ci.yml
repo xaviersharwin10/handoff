@@ -1,0 +1,67 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  app:
+    name: Dashboard typecheck + build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install + typecheck + build
+        working-directory: dashboard
+        run: |
+          pnpm install --no-frozen-lockfile
+          pnpm exec tsc --noEmit
+          pnpm build
+        env:
+          # dummy server secrets so route modules can load during build
+          ENOKI_SECRET_KEY: dummy
+          HANDOFF_MASTER_SECRET: "00"
+
+  sdk:
+    name: SDK build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - working-directory: sdk
+        run: |
+          pnpm install --no-frozen-lockfile
+          pnpm build
+
+  contracts:
+    name: Move tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Sui CLI (testnet)
+        run: |
+          set -e
+          TAG=$(curl -s "https://api.github.com/repos/MystenLabs/sui/releases?per_page=40" \
+            | grep -oE '"tag_name": "testnet-v[0-9.]+"' | head -1 | cut -d'"' -f4)
+          echo "Installing Sui $TAG"
+          curl -sSL -o sui.tgz "https://github.com/MystenLabs/sui/releases/download/${TAG}/sui-${TAG}-ubuntu-x86_64.tgz"
+          tar -xzf sui.tgz
+          sudo mv sui /usr/local/bin/sui
+          sui --version
+      - name: Move tests — grants
+        working-directory: contracts
+        run: sui move test
+      - name: Move tests — vault (Seal policy + provable deletion)
+        working-directory: vault
+        run: sui move test
