@@ -115,6 +115,15 @@ node scripts/e2e-superset.mjs      # live e2e (8 checks): scoped recall · no cr
                                    # foreign-vault attacker denied · revoke kills reads AND writes
 ```
 
+## Why not just build on MemWal / Walrus Memory?
+
+We started there — and hit two walls that define this project:
+
+1. **Provable deletion requires owning the Seal policy.** Crypto-shredding works by making *your own* on-chain `seal_approve` refuse a memory id forever. Under a managed memory service, the Seal policy belongs to the service's account model — a user can ask for deletion, but can't *prove* it, and the service could always re-derive access. The off switch only means something if the policy object is yours. So Handoff implements its own Vault policy (`vault/`) and talks to Walrus + Seal directly.
+2. **It pushed us to build user-grade controls the SDK doesn't have:** per-memory shredding with public proof, time-boxed third-party grants with on-chain audit of every read/write/denial, agent write-back with provenance, passive capture from any OpenAI-compatible tool, and a no-wallet (zkLogin) consumer app over all of it.
+
+Same thesis as the platform — memory should be portable and verifiable — taken one layer deeper: **verifiable *erasure* and user-side control**, built directly on the primitives.
+
 ## Honest limitations / roadmap
 
 - **The gateway sees plaintext in flight.** It decrypts (as your revocable delegate) to serve recalls, and the capture proxy necessarily sees your chats to distil them. You can fire it on-chain at any time, and it stores nothing — but a fully end-to-end version would decrypt client-side via the same `seal_approve` (the policy already supports it; it's a client build, not a protocol change).
