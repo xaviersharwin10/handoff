@@ -3,7 +3,7 @@
  * Signs the canonical recall message with the grant credential and calls the proxy.
  */
 import * as ed from "@noble/ed25519";
-import { recallMessage } from "./grant.mjs";
+import { credentialMessage } from "./grant.mjs";
 
 export async function recallViaHandoff({ proxyUrl, grantId, credentialPrivateKey, query, limit }) {
   const timestamp = Date.now();
@@ -11,7 +11,7 @@ export async function recallViaHandoff({ proxyUrl, grantId, credentialPrivateKey
     typeof credentialPrivateKey === "string"
       ? Uint8Array.from(Buffer.from(credentialPrivateKey, "hex"))
       : credentialPrivateKey;
-  const signature = await ed.signAsync(recallMessage(grantId, query, timestamp), priv);
+  const signature = await ed.signAsync(credentialMessage("recall", grantId, query, timestamp), priv);
   const res = await fetch(`${proxyUrl}/recall`, {
     method: "POST",
     headers: { "content-type": "application/json" },
