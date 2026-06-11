@@ -49,6 +49,22 @@ public struct GrantRevoked has copy, drop {
     revoked_at: u64,
 }
 
+/// One access decision by the Handoff gateway, recorded on-chain so the audit
+/// trail is durable and tamper-evident. `gateway` is the emitter; the dashboard
+/// only trusts entries from the known gateway address, so forged entries from
+/// other senders are ignored and real allow/deny events can't be hidden.
+public struct AccessLogged has copy, drop {
+    grant_id: ID,
+    memwal_account: address,
+    grantee_label: String,
+    namespace: String,
+    allowed: bool,
+    reason: String,
+    result_count: u64,
+    gateway: address,
+    at: u64,
+}
+
 fun clone_string(s: &String): String {
     string::utf8(*s.as_bytes())
 }
@@ -98,6 +114,33 @@ public fun revoke_grant(grant: &mut Grant, clock: &Clock, ctx: &TxContext) {
         grant_id: object::id(grant),
         grantor: grant.grantor,
         revoked_at: clock.timestamp_ms(),
+    });
+}
+
+/// Record an access decision on-chain. Called by the gateway after it enforces
+/// a grant. Permissionless to call, but only the real gateway's address produces
+/// trusted entries (the dashboard filters by it).
+public fun log_access(
+    grant_id: address,
+    memwal_account: address,
+    grantee_label: String,
+    namespace: String,
+    allowed: bool,
+    reason: String,
+    result_count: u64,
+    clock: &Clock,
+    ctx: &TxContext,
+) {
+    event::emit(AccessLogged {
+        grant_id: object::id_from_address(grant_id),
+        memwal_account,
+        grantee_label,
+        namespace,
+        allowed,
+        reason,
+        result_count,
+        gateway: ctx.sender(),
+        at: clock.timestamp_ms(),
     });
 }
 
