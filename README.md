@@ -5,6 +5,8 @@
 Agents are stateless: they forget between sessions, can't share context across tools, and their memory — when they have one — is locked in a provider's database. Handoff is the memory layer that fixes that *without creating a new surveillance database*: every memory is **Seal-encrypted under an on-chain policy only you control**, agents you choose can **read it and write their findings back**, agents **hand work off to each other through the vault**, and any of it can be **shredded with on-chain proof** — permanently undecryptable, even though the encrypted bytes live on a public network.
 
 > **Sui Overflow 2026 · Walrus track.** Built directly on [Walrus](https://walrus.xyz) (storage) + [Seal](https://github.com/MystenLabs/seal) (threshold encryption) + [Sui](https://sui.io) (policy & audit) + [Enoki zkLogin](https://docs.enoki.mystenlabs.com) (no wallet).
+>
+> New to any of those terms? **[HOW_IT_WORKS.md](HOW_IT_WORKS.md)** explains the entire product from zero — every building block, every flow, the security model, and an honest FAQ.
 
 ---
 
