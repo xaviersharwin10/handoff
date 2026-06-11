@@ -5,6 +5,7 @@ import { useSuiClient, useSignTransaction } from "@mysten/dapp-kit";
 import { AccountGate, AccountChip } from "./account-gate";
 import { HandoffProvider, useHandoff } from "./handoff-context";
 import { ProvisionGate } from "./provision-gate";
+import { ChatSection } from "./chat-section";
 import { useToast } from "./toast";
 import {
   listGrantsForOwner, listAccessLog, listShredProofs,
@@ -65,6 +66,7 @@ function Dashboard() {
       <main className="mx-auto w-full max-w-5xl px-5 pb-16">
         <Intro />
         <GettingStarted hasMemory={memoryCount > 0} hasGrant={grantCount > 0} />
+        <ChatSection />
         <ConnectToolsSection />
         <div className="mt-6 grid gap-6 lg:grid-cols-2">
           <MemorySection categories={categories} addCategory={addCategory} onAdded={() => setMemoryCount((n) => n + 1)} />
@@ -120,7 +122,7 @@ function Intro() {
   if (hidden) return null;
 
   const steps = [
-    { icon: <PlugIcon className="h-5 w-5" />, title: "Capture automatically", body: "Point your AI tools at one URL — every chat becomes encrypted memory only your vault can unlock." },
+    { icon: <PlugIcon className="h-5 w-5" />, title: "Capture automatically", body: "Chat right here — or connect your own AI tools. Every chat becomes encrypted memory only your vault can unlock." },
     { icon: <KeyIcon className="h-5 w-5" />, title: "Delegate to agents", body: "Grant any agent one category — it reads, works, and saves findings back. Agents hand off work to each other through your vault, every access audited on Sui." },
     { icon: <ShieldIcon className="h-5 w-5" />, title: "Erase with proof", body: "Shred anything — even what an agent learned about you. The on-chain proof shows it's cryptographically gone forever." },
   ];
@@ -215,10 +217,10 @@ function ConnectToolsSection() {
       <div className="flex items-start gap-3">
         <div className="mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-cyan-500/10 text-cyan-400"><PlugIcon className="h-5 w-5" /></div>
         <div className="flex-1">
-          <h2 className="text-base font-semibold text-neutral-100">Connect your AI tools <span className="ml-1 rounded bg-cyan-500/15 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-cyan-300">passive capture</span></h2>
+          <h2 className="text-base font-semibold text-neutral-100">Bring your own AI tools <span className="ml-1 rounded bg-cyan-500/15 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-cyan-300">optional · power users</span></h2>
           <p className="text-sm text-neutral-500">
-            Point Cursor, Chatbox, or any OpenAI-compatible app at one URL. Every chat is auto-distilled into durable
-            memories, sorted into categories — <span className="text-cyan-300">you never type a memory by hand</span>. Then grant agents a slice.
+            Already use Cursor, Chatbox, Claude Desktop or your own scripts? Point any OpenAI-compatible app at one URL
+            (free key, minted here) and <span className="text-cyan-300">those chats feed the same vault</span> as the chat above.
           </p>
         </div>
         {!token && (
@@ -334,7 +336,11 @@ function MemorySection({ categories, addCategory, onAdded }: { categories: strin
   useEffect(() => {
     load();
     const t = setInterval(load, 10_000); // captured memories appear as they land
-    return () => clearInterval(t);
+    window.addEventListener("handoff:memory-maybe-changed", load); // chat nudges
+    return () => {
+      clearInterval(t);
+      window.removeEventListener("handoff:memory-maybe-changed", load);
+    };
   }, [load]);
 
   async function add() {
