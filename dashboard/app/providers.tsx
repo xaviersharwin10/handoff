@@ -10,6 +10,7 @@ import {
 } from "@mysten/dapp-kit";
 import { getJsonRpcFullnodeUrl } from "@mysten/sui/jsonRpc";
 import { isEnokiNetwork, registerEnokiWallets } from "@mysten/enoki";
+import { ToastProvider } from "./toast";
 import "@mysten/dapp-kit/dist/index.css";
 
 const { networkConfig } = createNetworkConfig({
@@ -46,7 +47,9 @@ export function Providers({ children }: { children: ReactNode }) {
     <QueryClientProvider client={queryClient}>
       <SuiClientProvider networks={networkConfig} defaultNetwork="testnet">
         <RegisterEnokiWallets />
-        <WalletProvider autoConnect>{children}</WalletProvider>
+        <WalletProvider autoConnect>
+          <ToastProvider>{children}</ToastProvider>
+        </WalletProvider>
       </SuiClientProvider>
     </QueryClientProvider>
   );

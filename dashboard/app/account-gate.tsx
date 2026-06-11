@@ -22,19 +22,44 @@ function SignInScreen() {
   const { mutate: connect, isPending } = useConnectWallet();
   const googleWallet = wallets.find(isGoogleWallet);
 
+  const points = [
+    "Store private memory for AI agents — encrypted on Walrus, owned by you.",
+    "Grant an agent one category, for a set time — scoped, expiring, revocable.",
+    "Every access enforced & logged on-chain. Revoke in one click.",
+  ];
+
   return (
-    <main className="grid min-h-screen place-items-center px-5">
-      <div className="w-full max-w-md text-center">
-        <div className="mx-auto mb-5 grid h-14 w-14 place-items-center rounded-2xl bg-gradient-to-br from-emerald-400 to-cyan-500 text-2xl font-black text-neutral-950">
-          H
+    <main className="grid min-h-screen place-items-center px-5 py-10">
+      <div className="w-full max-w-md">
+        <div className="mb-6 flex items-center gap-3">
+          <div className="grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-br from-emerald-400 to-cyan-500 text-xl font-black text-neutral-950">H</div>
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight text-neutral-50">Handoff</h1>
+            <p className="text-xs text-neutral-500">OAuth for AI memory</p>
+          </div>
         </div>
-        <h1 className="text-3xl font-bold tracking-tight text-neutral-50">Handoff</h1>
-        <p className="mt-2 text-neutral-400">
-          Lend <span className="text-emerald-400">scoped, revocable, time-boxed</span> slices of your AI
-          memory to other agents — enforced on-chain.
+
+        <h2 className="text-3xl font-bold leading-tight tracking-tight text-neutral-50">
+          Your AI memory,<br /><span className="text-emerald-400">on a leash.</span>
+        </h2>
+        <p className="mt-3 text-sm text-neutral-400">
+          Agents remember everything and never forget. Handoff puts you in control — lend specific,
+          expiring, revocable slices of your memory to the agents you choose.
         </p>
+
+        <ul className="mt-6 space-y-2.5">
+          {points.map((p, i) => (
+            <li key={i} className="flex items-start gap-2.5 text-sm text-neutral-300">
+              <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-emerald-500/15 text-emerald-400">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m5 12 5 5L20 7" /></svg>
+              </span>
+              {p}
+            </li>
+          ))}
+        </ul>
+
         <button
-          className="mt-7 inline-flex items-center gap-3 rounded-xl bg-white px-5 py-3 font-semibold text-neutral-900 hover:bg-neutral-200 disabled:opacity-50"
+          className="mt-7 inline-flex w-full items-center justify-center gap-3 rounded-xl bg-white px-5 py-3 font-semibold text-neutral-900 transition hover:bg-neutral-200 disabled:opacity-50"
           disabled={!googleWallet || isPending}
           onClick={() => googleWallet && connect({ wallet: googleWallet })}
         >
@@ -43,10 +68,10 @@ function SignInScreen() {
         </button>
         {!googleWallet && (
           <p className="mt-3 text-xs text-amber-400">
-            Google sign-in not available — check NEXT_PUBLIC_ENOKI_API_KEY / NEXT_PUBLIC_GOOGLE_CLIENT_ID.
+            Google sign-in unavailable — check NEXT_PUBLIC_ENOKI_API_KEY / NEXT_PUBLIC_GOOGLE_CLIENT_ID.
           </p>
         )}
-        <p className="mt-6 text-xs text-neutral-600">No wallet needed — you get a Sui identity via zkLogin.</p>
+        <p className="mt-3 text-center text-xs text-neutral-600">No wallet, no seed phrase. You get a Sui identity via zkLogin.</p>
       </div>
     </main>
   );
