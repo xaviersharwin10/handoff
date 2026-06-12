@@ -121,7 +121,11 @@ node scripts/e2e-superset.mjs      # live e2e (8 checks): scoped recall · no cr
 
 We started there — and hit two walls that define this project:
 
-1. **Provable deletion requires owning the Seal policy.** Crypto-shredding works by making *your own* on-chain `seal_approve` refuse a memory id forever. Under a managed memory service, the Seal policy belongs to the service's account model — a user can ask for deletion, but can't *prove* it, and the service could always re-derive access. The off switch only means something if the policy object is yours. So Handoff implements its own Vault policy (`vault/`) and talks to Walrus + Seal directly.
+1. **Provable deletion requires owning the Seal policy — and is architecturally impossible on the managed layer.** Two verifiable facts about the platform's deployed design:
+   - Its `seal_approve` derives **one Seal key per account** (`seal_key_id = bcs(owner_address)`): every memory in an account is encrypted to the *same* identity. Per-memory revocation can't exist there — once any party derives the account key, it opens *everything, forever*. (Handoff encrypts each memory to its own random identity, so keys are single-memory and individually revocable.)
+   - Its own architecture docs state that account *"deletion … is treated as a deactivation (freezing) rather than true erasure"* — account-level, with no per-memory tombstones and no public erasure proof.
+
+   Crypto-shredding works by making *your own* on-chain `seal_approve` refuse a memory id forever. The off switch only means something if the policy object is yours. So Handoff implements its own Vault policy (`vault/`) and talks to Walrus + Seal directly. (Walrus's native "deletable blobs" don't help either — that's storage reclamation, explicitly non-binding if other copies exist, with no cryptographic guarantee.)
 2. **It pushed us to build user-grade controls the SDK doesn't have:** per-memory shredding with public proof, time-boxed third-party grants with on-chain audit of every read/write/denial, agent write-back with provenance, passive capture from any OpenAI-compatible tool, and a no-wallet (zkLogin) consumer app over all of it.
 
 Same thesis as the platform — memory should be portable and verifiable — taken one layer deeper: **verifiable *erasure* and user-side control**, built directly on the primitives.
